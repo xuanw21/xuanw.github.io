@@ -2,56 +2,77 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>赛博霓虹导航系统</title>
+    <title>炫污染笑传之彩彩板</title>
     <style>
+        :root {
+            --glow-intensity: 1;
+        }
+
         body {
             margin: 0;
             height: 100vh;
-            background: linear-gradient(45deg, 
-                #ff0000, #ff7300, #fffb00, #48ff00,
-                #00ffd5, #002bff, #7a00ff, #ff00c8);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: 
+                linear-gradient(45deg, 
+                    #ff0000 0%, #ff7300 15%, #fffb00 30%,
+                    #48ff00 45%, #00ffd5 60%, #002bff 75%,
+                    #7a00ff 90%, #ff00c8 100%),
+                radial-gradient(circle, 
+                    rgba(255,255,255,0.2) 0%, 
+                    rgba(0,0,0,0.8) 100%);
+            background-size: 400% 400%, 200% 200%;
+            animation: 
+                gradientBG 8s ease infinite,
+                scanlines 0.2s linear infinite;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            filter: contrast(150%);
+            filter: contrast(180%) brightness(120%);
+            perspective: 1000px;
+        }
+
+        .cyber-pulse {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, 
+                rgba(255,255,255,0.2) 0%, 
+                transparent 70%);
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            pointer-events: none;
         }
 
         .glow-container {
             position: relative;
-            padding: 2rem;
-            background: rgba(0,0,0,0.8);
+            padding: 3rem;
+            background: rgba(0,0,0,0.7);
             border-radius: 20px;
-            box-shadow: 0 0 100px 20px rgba(255,255,255,0.3);
-            transform: rotateX(10deg) rotateY(-10deg);
-            perspective: 1000px;
-        }
-
-        .nav-wrapper {
-            position: relative;
-            z-index: 2;
+            box-shadow: 
+                0 0 200px 50px rgba(255,0,221,0.5),
+                0 0 100px 30px rgba(0,255,234,0.5),
+                0 0 50px 20px rgba(255,255,255,0.5);
+            transform: rotateX(15deg) rotateY(-5deg);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .nav-list {
             list-style: none;
             padding: 0;
             margin: 0;
+            position: relative;
+            z-index: 3;
         }
 
         .nav-item {
-            position: relative;
-            margin: 2rem;
-            transform-style: preserve-3d;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 3rem;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
         }
 
         .nav-link {
             display: block;
-            padding: 1.5rem 3rem;
+            padding: 2rem 4rem;
             font-family: 'Arial Black', sans-serif;
-            font-size: 2rem;
+            font-size: 2.5rem;
             text-decoration: none;
             color: transparent;
             background: linear-gradient(90deg,
@@ -60,125 +81,158 @@
                 #7a00ff 90%, #ff00c8 100%);
             -webkit-background-clip: text;
             background-clip: text;
-            border: 3px solid transparent;
+            border: 4px solid;
+            border-image: linear-gradient(45deg, 
+                #ff0000, #ff7300, #fffb00, #48ff00,
+                #00ffd5, #002bff, #7a00ff, #ff00c8) 1;
             border-radius: 15px;
             position: relative;
             transition: all 0.3s ease;
-            animation: textGlow 2s ease-in-out infinite alternate;
+            animation: 
+                textGlow 1s ease-in-out infinite alternate,
+                borderFlow 3s linear infinite;
         }
 
-        .nav-link:before {
+        .nav-link::before {
             content: '';
             position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
             background: inherit;
-            filter: blur(20px);
+            filter: blur(30px) brightness(2);
             z-index: -1;
-            opacity: 0.7;
+            opacity: 0.8;
+            mix-blend-mode: screen;
         }
 
         .nav-link:hover {
-            transform: scale(1.2) rotateY(15deg);
-            box-shadow: 0 0 50px 10px rgba(255,255,255,0.5);
-            animation: rainbowBorder 1s linear infinite;
+            transform: 
+                scale(1.3) 
+                rotateY(20deg) 
+                translateZ(50px);
+            filter: 
+                drop-shadow(0 0 30px currentColor)
+                hue-rotate(360deg);
+            animation: 
+                textGlow 0.5s ease-in-out infinite alternate,
+                borderFlow 1s linear infinite,
+                shake 0.3s ease infinite;
         }
 
         @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% { background-position: 0% 50%, 0 0; }
+            50% { background-position: 100% 50%, 100% 100%; }
+            100% { background-position: 0% 50%, 0 0; }
         }
 
         @keyframes textGlow {
-            from { text-shadow: 0 0 10px #fff,
-                         0 0 20px #ff00de,
-                         0 0 30px #ff00de,
-                         0 0 40px #ff00de;
+            0% { 
+                text-shadow: 
+                    0 0 20px #fff,
+                    0 0 30px #ff00de,
+                    0 0 40px #ff00de;
             }
-            to { text-shadow: 0 0 20px #fff,
-                       0 0 30px #00ffea,
-                       0 0 40px #00ffea,
-                       0 0 50px #00ffea;
-            }
-        }
-
-        @keyframes rainbowBorder {
-            100% { border-image: linear-gradient(45deg, 
-                    #ff0000, #ff7300, #fffb00, #48ff00,
-                    #00ffd5, #002bff, #7a00ff, #ff00c8) 1;
-                border-image-slice: 1;
+            100% { 
+                text-shadow: 
+                    0 0 30px #fff,
+                    0 0 50px #00ffea,
+                    0 0 60px #00ffea;
             }
         }
 
-        /* 添加全屏粒子效果 */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
+        @keyframes borderFlow {
+            100% { border-image-source: linear-gradient(45deg, 
+                #ff00c8, #ff0000, #ff7300, #fffb00,
+                #48ff00, #00ffd5, #002bff, #7a00ff);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.2; }
+        }
+
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 -20px; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         .particle {
             position: absolute;
             background: radial-gradient(circle, 
-                rgba(255,255,255,0.8) 0%, 
-                rgba(255,255,255,0) 70%);
+                rgba(255,255,255,0.9) 0%, 
+                transparent 70%);
             border-radius: 50%;
-            animation: particleAnim 2s infinite;
+            animation: particleAnim 1.5s infinite;
+            mix-blend-mode: screen;
         }
 
         @keyframes particleAnim {
             0% { transform: scale(0); opacity: 1; }
-            100% { transform: scale(3); opacity: 0; }
+            100% { transform: scale(5); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <!-- 动态粒子背景 -->
-    <div class="particles" id="particles"></div>
-
+    <div class="cyber-pulse"></div>
+    
     <div class="glow-container">
-        <nav class="nav-wrapper">
+        <nav>
             <ul class="nav-list">
-                <li class="nav-item"><a href="ai.html" class="nav-link">炫舞小模型ai</a></li>
+                <li class="nav-item"><a href="ai.html" class="nav-link">炫舞小模型AI</a></li>
                 <li class="nav-item"><a href="df.html" class="nav-link">类东方小游戏</a></li>
-                <li class="nav-item"><a href="hd.html" class="nav-link">电脑配置(矿渣）生成器</a></li>
-                <li class="nav-item"><a href="cy.html" class="nav-link">创游世界小游戏</a></li>
+                <li class="nav-item"><a href="hd.html" class="nav-link">矿渣配置生成器</a></li>
+                <li class="nav-item"><a href="cy.html" class="nav-link">创游世界作者模拟器</a></li>
             </ul>
         </nav>
     </div>
 
     <script>
-        // 生成动态粒子
+        // 动态粒子生成器
         function createParticles() {
-            const particles = document.getElementById('particles');
-            for(let i = 0; i < 50; i++) {
+            const container = document.body;
+            for(let i = 0; i < 100; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 2 + 's';
                 particle.style.width = particle.style.height = 
-                    Math.random() * 10 + 5 + 'px';
-                particles.appendChild(particle);
+                    Math.random() * 20 + 10 + 'px';
+                container.appendChild(particle);
             }
         }
         createParticles();
 
-        // 添加随机颜色变化
+        // 动态颜色引擎
         document.querySelectorAll('.nav-link').forEach(link => {
+            let hue = 0;
             setInterval(() => {
-                link.style.background = `linear-gradient(${Math.random()*360}deg,
-                    #ff0000 0%, #ff7300 15%, #fffb00 30%,
-                    #48ff00 45%, #00ffd5 60%, #002bff 75%,
-                    #7a00ff 90%, #ff00c8 100%)`;
-            }, 3000);
+                link.style.borderImage = `
+                    linear-gradient(${hue}deg, 
+                    #ff0000, #ff7300, #fffb00, #48ff00,
+                    #00ffd5, #002bff, #7a00ff, #ff00c8) 1`;
+                hue = (hue + 10) % 360;
+            }, 50);
+        });
+
+        // 点击事件优化
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                link.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    window.location.href = link.href;
+                }, 300);
+            });
         });
     </script>
 </body>
