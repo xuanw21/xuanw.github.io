@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xuanw_pcmaker</title>
+    <style>
+        :root {
+            --green: #00ff00;
+            --bg: #001100;
+            --dark: #002200;
+            --stripe1: #001a00;
+            --stripe2: #002600;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--green);
+            margin: 0;
+            padding: 15px;
+        }
+
+        #container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        button {
+            background: linear-gradient(45deg, #004400, #001100);
+            color: var(--green);
+            border: 2px solid var(--green);
+            padding: 15px;
+            width: 100%;
+            font-size: 18px;
+            margin: 15px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px #00ff0033;
+        }
+
+        .config-box {
+            border: 2px dashed var(--green);
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            background: 
+                repeating-linear-gradient(
+                    -45deg,
+                    var(--stripe1),
+                    var(--stripe1) 10px,
+                    var(--stripe2) 10px,
+                    var(--stripe2) 20px
+                ),
+                linear-gradient(
+                    rgba(0, 255, 0, 0.05) 50%,
+                    transparent 50%
+                );
+            background-size: auto, 100% 4px;
+            box-shadow: 
+                inset 0 0 30px #000800,
+                0 0 30px #00ff0033;
+        }
+
+        .config-box::before {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: -50%;
+            width: 200%;
+            height: 2000%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 15px,
+                var(--green) 15px,
+                var(--green) 30px
+            );
+            opacity: 0.1;
+            animation: scan 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0%); }
+            100% { transform: translateY(5%); }
+        }
+
+        .component {
+            margin: 15px 0;
+            padding: 15px;
+            position: relative;
+            border-radius: 5px;
+            background: linear-gradient(
+                90deg,
+                #00ff0022 0%,
+                #002200 80%
+            );
+            box-shadow: 
+                0 0 10px #00ff0011,
+                inset 3px 0 0 var(--green);
+            transition: 0.3s;
+            border-left: 3px solid var(--green);
+            z-index: 1;
+        }
+
+        .component::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent,
+                var(--green),
+                transparent
+            );
+            box-shadow: 0 0 15px var(--green);
+        }
+
+        .component:hover {
+            transform: translateX(10px);
+            box-shadow: 
+                0 0 20px #00ff0044,
+                inset 3px 0 0 #00ff00;
+        }
+
+        /* 新增类型标签样式 */
+        .component-type {
+            position: absolute;
+            right: 15px;
+            bottom: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff0088;
+            text-shadow: 0 0 15px #00ff00;
+            transform: rotate(2deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .warning {
+            color: #ff5555;
+            font-size: 12px;
+            margin: 5px 0 0 20px;
+            position: relative;
+        }
+
+        .warning::before {
+            content: "⚠";
+            position: absolute;
+            left: -18px;
+            animation: blink 1s infinite;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--green),
+                transparent
+            );
+            margin: 20px 0;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h2>☢️核弹配置生成器promax</h2>
+        <button onclick="generateConfig()">生成渡劫配置</button>
+        <div id="output" class="config-box"></div>
+    </div>
+
+    <script>
+        const components = {
+    cpu: [
+        { 
+            desc: "Intel 至强 E5-2678 V3 (12核24线程)", 
+            price: 85,
+            tips: ["⚠️ 需配合三炷香超频", "🕯️ 建议开机前诵经"]
+        },
+        { 
+            desc: "AMD 推土机 FX-8350 (8核4.0GHz)", 
+            price: 120,
+            tips: ["🔥 可当暖手宝使用", "⚡ 功耗堪比电磁炉"]
+        },
+        {
+            desc: "Intel 奔腾 G6951（双核）",
+            price: 10,
+            tips: ["⚠️ 不支持运行任何现代游戏，适合轻度办公", "🧳 性能强劲到可以驱动一台电风扇"]
+        },
+        {
+            desc: "AMD 锐龙 5 3500X（6核6线程）",
+            price: 50,
+            tips: ["💥 开机时会自动播放《小苹果》", "💡 适合运行所有2010年以前的游戏"]
+        },
+        {
+            desc: "Intel 酷睿 i3-2100（双核）",
+            price: 20,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        }
+    ],
+    gpu: [
+        { 
+            desc: "NVIDIA GTX 750 Ti (2GB DDR5)", 
+            price: 98,
+            tips: ["✨ 建议涂牙膏散热", "💫 每周需要上香保养"]
+        },
+        { 
+            desc: "AMD HD 7850 (1GB DDR5)", 
+            price: 65,
+            tips: ["🌋 外接电风扇散热", "🔮 驱动需开光处理"]
+        },
+        {
+            desc: "NVIDIA GeForce 610 (1GB DDR3)",
+            price: 15,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "AMD Radeon R7 240 (2GB DDR3)",
+            price: 25,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "NVIDIA GeForce 8800 GT (512MB GDDR3)",
+            price: 10,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        }
+    ],
+    ram: [
+        { 
+            desc: "DDR3 8GB 1333MHz (服务器拆机)", 
+            price: 35,
+            tips: ["🧹 需定期橡皮擦清洁", "🌀 按风水方位安装"]
+        },
+        { 
+            desc: "DDR3 4GB×2 1600MHz", 
+            price: 45,
+            tips: ["⚡ 必须组成量子纠缠阵列", "📿 内存条需开光"]
+        },
+        {
+            desc: "DDR2 2GB×2 800MHz",
+            price: 20,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "DDR4 16GB 2666MHz",
+            price: 60,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "DDR1 512MB×2 400MHz",
+            price: 5,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        }
+    ],
+    storage: [
+        { 
+            desc: "500GB 机械硬盘 (网吧拆机)", 
+            price: 25,
+            tips: ["⏳ 建议外接风扇助转", "💾 数据需定期备份"]
+        },
+        { 
+            desc: "128GB SATA固态 (矿渣盘)", 
+            price: 38,
+            tips: ["🔮 每月重新开光", "⚡ 避免写入重要数据"]
+        },
+        {
+            desc: "1TB 机械硬盘 (二手市场)",
+            price: 30,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "256GB NVMe固态 (二手市场)",
+            price: 50,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "8GB U盘 (二手市场)",
+            price: 10,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        }
+    ],
+    psu: [
+        { 
+            desc: "长城1250W矿渣电源", 
+            price: 58,
+            tips: ["💥 开机前穿绝缘鞋", "☢️ 建议三米外操作"]
+        },
+        { 
+            desc: "航嘉 180W拆机电源", 
+            price: 22,
+            tips: ["🕯️ 搭配蜡烛辅助供电", "🔌 禁止同时使用手机充电"]
+        },
+        {
+            desc: "金河田 300W电源 (二手市场)",
+            price: 15,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "酷冷至尊 500W电源 (二手市场)",
+            price: 30,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "先马 200W电源 (二手市场)",
+            price: 10,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        }
+    ],
+    case: [
+        { 
+            desc: "鞋盒机箱 (附泡面包装)", 
+            price: 0,
+            tips: ["📦 防蟑螂入侵系统", "🎁 可定制泡面味香薰"]
+        },
+        { 
+            desc: "镀锌板开放式机架", 
+            price: 20,
+            tips: ["❄️ 冬季取暖神器", "⚡ 附赠触电体验"]
+        },
+        {
+            desc: "纸箱机箱 (二手市场)",
+            price: 5,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "塑料桶机箱 (二手市场)",
+            price: 10,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        },
+        {
+            desc: "木箱机箱 (二手市场)",
+            price: 20,
+            tips: ["✳️ Kimi的扩展组件", "🈚 暂无介绍"]
+        }
+    ]
+};
+
+        function generateConfig() {
+            const config = [];
+            let total = 0;
+            
+            for(let type in components) {
+                const pool = components[type];
+                const selected = pool[Math.floor(Math.random()*pool.length)];
+                
+                config.push({
+                    type: type.toUpperCase(),
+                    desc: selected.desc,
+                    price: selected.price,
+                    tips: selected.tips
+                });
+                total += selected.price;
+            }
+
+            const output = `
+                <h3>「${getRandomName()}」量子配置</h3>
+                ${config.map(item => `
+                    <div class="component">
+                        <div class="component-type">${item.type}</div>
+                        <div>${item.desc}</div>
+                        <div>💰 估值: ¥${item.price}</div>
+                        ${item.tips.map(tip => `
+                            <div class="warning">${tip}</div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+                <hr>
+                <div style="text-align:center;">
+                    <h4>总价值: ¥${total}</h4>
+                    <div class="warning">电子功德: +${Math.floor(Math.random()*100)}</div>
+                </div>
+            `;
+
+            document.getElementById('output').innerHTML = output;
+        }
+
+        function getRandomName() {
+            const names = [
+                "虚空引雷", "量子波动", "玄学大乘", 
+                "丐帮至尊", "垃圾飞升", "图拉丁真传"
+            ];
+            return names[Math.floor(Math.random()*names.length)] + "版";
+        }
+    </script>
+</body>
+</html>
