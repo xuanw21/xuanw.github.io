@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>全屏滑动弹幕游戏</title>
+    <style>
+        :root {
+            --glow-color: rgba(255, 50, 150, 0.8);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            touch-action: none;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #gameArea {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: 
+                linear-gradient(45deg, 
+                    rgba(255,0,150,0.1) 0%, 
+                    rgba(0,100,255,0.1) 100%),
+                radial-gradient(circle at 50% 50%, 
+                    rgba(255,255,255,0.05) 0%,
+                    rgba(0,0,0,0.8) 80%);
+        }
+
+        #player {
+            width: 24px;
+            height: 24px;
+            background: 
+                radial-gradient(circle at 30% 30%, 
+                    #00ffff 0%, 
+                    #0088ff 70%);
+            position: absolute;
+            border-radius: 50%;
+            transition: transform 0.1s;
+            box-shadow: 0 0 20px #00ffff;
+            filter: drop-shadow(0 0 10px var(--glow-color));
+            z-index: 2;
+        }
+
+        .bullet {
+            width: 12px;
+            height: 12px;
+            position: absolute;
+            border-radius: 50%;
+            animation: bullet-glow 1s infinite alternate;
+            filter: drop-shadow(0 0 5px var(--glow-color));
+            z-index: 1;
+        }
+
+        @keyframes bullet-glow {
+            from { box-shadow: 0 0 5px var(--glow-color); }
+            to { box-shadow: 0 0 15px var(--glow-color); }
+        }
+
+        #gameOver {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 15px;
+            border: 2px solid var(--glow-color);
+            box-shadow: 0 0 30px var(--glow-color);
+            backdrop-filter: blur(10px);
+            z-index: 3;
+        }
+
+        #restartButton {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border: none;
+            padding: 1rem 2rem;
+            color: white;
+            border-radius: 25px;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transition: transform 0.2s;
+        }
+
+        #score {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            text-shadow: 0 0 10px var(--glow-color);
+            z-index: 2;
+        }
+
+        .touch-effect {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: touch-pulse 0.5s forwards;
+        }
+
+        @keyframes touch-pulse {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            to { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameArea">
+        <div id="score">SCORE: 0</div>
+        <div id="player"></div>
+        <div id="gameOver">
+            <h2>𝔾𝔸𝕄𝔼 𝕆𝕍𝔼ℝ</h2>
+            <p>最终得分: <span id="finalScore">0</span></p>
+            <button id="restartButton">✦ 重新开始 ✦</button>
+        </div>
+    </div>
+
+    <script>
+        let gameActive = true;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let playerX = window.innerWidth/2;
+        let playerY = window.innerHeight - 100;
+        let score = 0;
+        let bulletInterval;
+        let isMoving = false;
+
+        const player = document.getElementById('player');
+        const gameArea = document.getElementById('gameArea');
+
+        // 初始化游戏
+        function initGame() {
+            gameActive = true;
+            score = 0;
+            playerX = window.innerWidth/2;
+            playerY = window.innerHeight - 100;
+            player.style.left = playerX + 'px';
+            player.style.top = playerY + 'px';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('score').textContent = 'SCORE: 0';
+            
+            // 清除所有子弹和特效
+            document.querySelectorAll('.bullet, .touch-effect').forEach(el => el.remove());
+            
+            if(bulletInterval) clearInterval(bulletInterval);
+            bulletInterval = setInterval(generateBullets, 1500);
+        }
+
+        // 全屏滑动控制
+        function createTouchEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.className = 'touch-effect';
+            effect.style.left = x + 'px';
+            effect.style.top = y + 'px';
+            gameArea.appendChild(effect);
+            setTimeout(() => effect.remove(), 500);
+        }
+
+        document.addEventListener('touchstart', (e) => {
+            if (!gameActive) return;
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            playerX = parseInt(player.style.left) || window.innerWidth/2;
+            playerY = parseInt(player.style.top) || window.innerHeight/2;
+            isMoving = true;
+            createTouchEffect(touchStartX, touchStartY);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!gameActive || !isMoving) return;
+            const touch = e.touches[0];
+            
+            // 计算相对移动量
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            
+            // 更新玩家位置
+            const newX = playerX + deltaX * 0.05;
+            const newY = playerY + deltaY * 0.05;
+            
+            // 边界限制
+            playerX = Math.max(20, Math.min(window.innerWidth - 20, newX));
+            playerY = Math.max(20, Math.min(window.innerHeight - 20, newY));
+            
+            player.style.left = playerX + 'px';
+            player.style.top = playerY + 'px';
+            
+            // 添加拖尾特效
+            if(Date.now() % 3 === 0) {
+                const trail = document.createElement('div');
+                trail.className = 'touch-effect';
+                trail.style.width = '40px';
+                trail.style.height = '40px';
+                trail.style.background = 'radial-gradient(circle, rgba(0,255,255,0.3) 0%, transparent 70%)';
+                trail.style.left = playerX + 12 + 'px';
+                trail.style.top = playerY + 12 + 'px';
+                gameArea.appendChild(trail);
+                setTimeout(() => trail.remove(), 300);
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            isMoving = false;
+        });
+
+        // 弹幕生成系统
+        function generateBullets() {
+            if(!gameActive) return;
+            
+            const patterns = [
+                () => { // 自机狙
+                    const angle = Math.atan2(playerY - 50, playerX - window.innerWidth/2);
+                    for(let i=0; i<7; i++) {
+                        createBullet(
+                            window.innerWidth/2, 50,
+                            angle + (i-3)*0.1,
+                            3 + Math.random()*2,
+                            `rgba(255, ${50+i*30}, 150, 0.9)`
+                        );
+                    }
+                },
+                () => { // 环形弹幕
+                    const cx = Math.random() * window.innerWidth;
+                    const cy = 50;
+                    for(let i=0; i<24; i++) {
+                        createBullet(
+                            cx, cy,
+                            (i * Math.PI)/12,
+                            4,
+                            `hsl(${i*15}, 100%, 50%)`
+                        );
+                    }
+                },
+                () => { // 交叉激光
+                    const baseX = Math.random() * window.innerWidth;
+                    const baseY = 50;
+                    for(let i=0; i<9; i++) {
+                        createBullet(
+                            baseX, baseY,
+                            Math.PI/4 + (i-4)*0.15,
+                            6,
+                            `rgba(0, ${150+i*20}, 255, 0.9)`
+                        );
+                        createBullet(
+                            baseX, baseY,
+                            -Math.PI/4 + (i-4)*0.15,
+                            6,
+                            `rgba(255, ${50+i*20}, 0, 0.9)`
+                        );
+                    }
+                }
+            ];
+            
+            patterns[Math.floor(Math.random()*patterns.length)]();
+            score += 100;
+            document.getElementById('score').textContent = `SCORE: ${score}`;
+        }
+
+        // 创建弹幕
+        function createBullet(x, y, angle, speed, color) {
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            bullet.style.cssText = `
+                left: ${x}px;
+                top: ${y}px;
+                background: ${color};
+                --glow-color: ${color};
+            `;
+            
+            gameArea.appendChild(bullet);
+            let alive = true;
+            
+            const move = () => {
+                if(!gameActive || !alive) return;
+                
+                x += Math.cos(angle) * speed;
+                y += Math.sin(angle) * speed;
+                bullet.style.left = x + 'px';
+                bullet.style.top = y + 'px';
+                
+                // 碰撞检测
+                const playerRect = player.getBoundingClientRect();
+                const bulletRect = bullet.getBoundingClientRect();
+                
+                if (!(bulletRect.right < playerRect.left || 
+                      bulletRect.left > playerRect.right ||
+                      bulletRect.bottom < playerRect.top || 
+                      bulletRect.top > playerRect.bottom)) {
+                    gameOver();
+                }
+                
+                if(y > window.innerHeight + 50 || x < -50 || x > window.innerWidth + 50) {
+                    bullet.remove();
+                    alive = false;
+                } else {
+                    requestAnimationFrame(move);
+                }
+            };
+            
+            move();
+        }
+
+        // 游戏结束
+        function gameOver() {
+            gameActive = false;
+            isMoving = false;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('finalScore').textContent = score;
+            clearInterval(bulletInterval);
+        }
+
+        // 重新开始
+        document.getElementById('restartButton').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            initGame();
+        });
+
+        // 启动游戏
+        initGame();
+    </script>
+</body>
+</html>
