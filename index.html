@@ -1,383 +1,185 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <title>创游世界作者模拟器</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>赛博霓虹导航系统</title>
     <style>
         body {
-            font-family: 'Arial Rounded MT Bold', sans-serif;
             margin: 0;
-            padding: 10px;
-            background: #0a0a1a;
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        .neon-title {
-            text-align: center;
-            font-size: 2.5em;
-            color: #0ff;
-            text-shadow: 0 0 10px #0ff,
-                         0 0 20px #0ff,
-                         0 0 30px #0ff;
-            animation: neonPulse 1.5s infinite alternate;
-            margin: 20px 0;
-        }
-
-        .status {
-            background: rgba(0, 0, 50, 0.8);
-            padding: 15px;
-            border-radius: 15px;
-            margin: 15px 0;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #0ff;
-            box-shadow: 0 0 15px #0ff;
-        }
-
-        .status::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            height: 100vh;
             background: linear-gradient(45deg, 
-                #0ff 25%, 
-                #f0f 50%, 
-                #0ff 75%);
-            animation: rotate 4s linear infinite;
-            opacity: 0.1;
-        }
-
-        .status-item {
-            margin: 10px 0;
-            font-size: 1.2em;
-            position: relative;
-            text-shadow: 0 0 5px rgba(0,255,255,0.5);
-        }
-
-        .buttons {
-            display: grid;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        button {
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            background: linear-gradient(45deg, #4a00e0, #8e2de2);
-            color: white;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 0 10px rgba(0,255,255,0.3);
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        button::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, 
-                transparent 25%, 
-                rgba(255,255,255,0.2) 50%, 
-                transparent 75%);
-            animation: shine 3s infinite;
-        }
-
-        .choice-box {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,30,0.9);
-            padding: 15px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            display: none;
-            border-top: 2px solid #0ff;
-            backdrop-filter: blur(5px);
-        }
-
-        .history {
-            background: rgba(0,0,30,0.8);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #0ff;
-            box-shadow: 0 0 15px #0ff;
-        }
-
-        .record {
-            margin: 5px 0;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 5px;
-            font-size: 14px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            animation: slideIn 0.5s ease;
-        }
-
-        #rules {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #0ff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+                #ff0000, #ff7300, #fffb00, #48ff00,
+                #00ffd5, #002bff, #7a00ff, #ff00c8);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             display: flex;
-            align-items: center;
             justify-content: center;
-            box-shadow: 0 0 15px #0ff;
-            cursor: pointer;
-            animation: pulse 2s infinite;
+            align-items: center;
+            overflow: hidden;
+            filter: contrast(150%);
         }
 
-        @keyframes neonPulse {
-            from { text-shadow: 0 0 10px #0ff; }
-            to { text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }
+        .glow-container {
+            position: relative;
+            padding: 2rem;
+            background: rgba(0,0,0,0.8);
+            border-radius: 20px;
+            box-shadow: 0 0 100px 20px rgba(255,255,255,0.3);
+            transform: rotateX(10deg) rotateY(-10deg);
+            perspective: 1000px;
         }
 
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
+        .nav-wrapper {
+            position: relative;
+            z-index: 2;
         }
 
-        @keyframes shine {
-            100% { transform: translateX(100%); }
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .nav-item {
+            position: relative;
+            margin: 2rem;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .nav-link {
+            display: block;
+            padding: 1.5rem 3rem;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2rem;
+            text-decoration: none;
+            color: transparent;
+            background: linear-gradient(90deg,
+                #ff0000 0%, #ff7300 15%, #fffb00 30%,
+                #48ff00 45%, #00ffd5 60%, #002bff 75%,
+                #7a00ff 90%, #ff00c8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        .nav-link:before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: inherit;
+            filter: blur(20px);
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        .nav-link:hover {
+            transform: scale(1.2) rotateY(15deg);
+            box-shadow: 0 0 50px 10px rgba(255,255,255,0.5);
+            animation: rainbowBorder 1s linear infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes textGlow {
+            from { text-shadow: 0 0 10px #fff,
+                         0 0 20px #ff00de,
+                         0 0 30px #ff00de,
+                         0 0 40px #ff00de;
+            }
+            to { text-shadow: 0 0 20px #fff,
+                       0 0 30px #00ffea,
+                       0 0 40px #00ffea,
+                       0 0 50px #00ffea;
+            }
+        }
+
+        @keyframes rainbowBorder {
+            100% { border-image: linear-gradient(45deg, 
+                    #ff0000, #ff7300, #fffb00, #48ff00,
+                    #00ffd5, #002bff, #7a00ff, #ff00c8) 1;
+                border-image-slice: 1;
+            }
+        }
+
+        /* 添加全屏粒子效果 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, 
+                rgba(255,255,255,0.8) 0%, 
+                rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            animation: particleAnim 2s infinite;
+        }
+
+        @keyframes particleAnim {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <h1 class="neon-title">创游世界作者模拟器</h1>
+    <!-- 动态粒子背景 -->
+    <div class="particles" id="particles"></div>
 
-    <div class="status">
-        <div class="status-item">🎮 游玩量: <span id="playCount">0</span></div>
-        <div class="status-item">💰 金钱: $<span id="money">100</span></div>
-        <div class="status-item">❤️ 信誉分: <span id="moral">100</span></div>
+    <div class="glow-container">
+        <nav class="nav-wrapper">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="ai.html" class="nav-link">炫舞小模型ai</a></li>
+                <li class="nav-item"><a href="df.html" class="nav-link">类东方小游戏</a></li>
+                <li class="nav-item"><a href="hd.html" class="nav-link">电脑配置(矿渣）生成器</a></li>
+                <li class="nav-item"><a href="cy.html" class="nav-link">创游世界小游戏</a></li>
+            </ul>
+        </nav>
     </div>
-
-    <div class="buttons">
-        <button onclick="showGameChoices()">🕹️ 制作游戏 ($50)</button>
-        <button onclick="showArtChoices()">🎨 绘制头像</button>
-    </div>
-
-    <div class="choice-box" id="choiceBox"></div>
-
-    <div class="history" id="history">
-        <div class="record">📜 游戏开始！初始资金$100</div>
-    </div>
-
-    <div id="rules" onclick="showRules()">❓</div>
 
     <script>
-        let playCount = 0;
-        let money = 100;
-        let moral = 100;
-        const themes = [
-            {name: "🚽 马桶人", boost: 2.5},
-            {name: "🚺 节奏盒子", boost: 2.2},
-            {name: "🔍 校区调查", boost: 2.0},
-            {name: "🎣 楚新钓", boost: 1.8}
-        ];
-
-        // 初始化显示
-        updateDisplay();
-        setTimeout(() => showRules(), 500);
-
-        function updateDisplay() {
-            document.getElementById('playCount').textContent = playCount;
-            document.getElementById('money').textContent = money;
-            const moralElem = document.getElementById('moral');
-            moralElem.textContent = moral;
-            moralElem.style.color = moral <= 30 ? '#ff4444' : '#fff';
-        }
-
-        function showGameChoices() {
-            if (money < 50) return alert('💸 资金不足！');
-            const box = document.getElementById('choiceBox');
-            box.innerHTML = `
-                <h3 style="color:#0ff; margin:10px 0">选择题材：</h3>
-                ${themes.map((t,i) => `
-                    <button style="background:linear-gradient(45deg, #${456+i*111}, #${789-i*111});
-                            margin:5px 0;
-                            font-size:1.1em"
-                            onclick="handleGameChoice(${i})">
-                        ${t.name} (收益×${t.boost})
-                    </button>
-                `).join('')}
-                <button style="background:linear-gradient(45deg, #2ecc71, #27ae60); 
-                        margin-top:10px;
-                        font-size:1.1em"
-                        onclick="handleOriginalGame()">
-                    ✨ 原创游戏 (信誉分+20)
-                </button>
-            `;
-            box.style.display = 'block';
-        }
-
-        function handleGameChoice(themeIndex) {
-            const theme = themes[themeIndex];
-            const baseGain = Math.floor(Math.random() * 800 + 200);
-            const gain = Math.floor(baseGain * theme.boost);
-            
-            money -= 50;
-            playCount += gain;
-            moral = Math.max(0, moral - 25);
-            
-            addRecord(`🔥 选择${theme.name} +${gain}游玩量 ↘25信誉分`);
-            checkStatus();
-            updateDisplay();
-            document.getElementById('choiceBox').style.display = 'none';
-        }
-
-        function handleOriginalGame() {
-            const gain = Math.floor(Math.random() * 300 + 100);
-            
-            money -= 50;
-            playCount += gain;
-            moral = Math.min(100, moral + 20);
-            
-            addRecord(`🌟 原创游戏 +${gain}游玩量 ↗20信誉分`);
-            checkStatus();
-            updateDisplay();
-            document.getElementById('choiceBox').style.display = 'none';
-        }
-
-        function showArtChoices() {
-            const box = document.getElementById('choiceBox');
-            box.innerHTML = `
-                <h3 style="color:#0ff; margin:10px 0">绘画方式：</h3>
-                <button style="background:linear-gradient(45deg, #ff6b6b, #ff4757)"
-                        onclick="handleArtChoice(1)">
-                    🖼️ 描摹作品 (收益高)
-                </button>
-                <button style="background:linear-gradient(45deg, #2ed573, #27ae60);
-                        margin-top:10px"
-                        onclick="handleArtChoice(2)">
-                    🎨 原创设计 (信誉分+15)
-                </button>
-            `;
-            box.style.display = 'block';
-        }
-
-        function handleArtChoice(choice) {
-            const base = playCount / 1000;
-            let gain = 0;
-            
-            if (choice === 1) {
-                gain = Math.floor(Math.random() * 500 * base) + 200;
-                money += gain;
-                moral = Math.max(0, moral - 20);
-                addRecord(`🖼️ 描摹作品 +$${gain} ↘20信誉分`);
-            } else {
-                gain = Math.floor(Math.random() * 100 * base) + 50;
-                money += gain;
-                moral = Math.min(100, moral + 15);
-                addRecord(`🎨 原创设计 +$${gain} ↗15信誉分`);
-            }
-            
-            checkStatus();
-            updateDisplay();
-            document.getElementById('choiceBox').style.display = 'none';
-        }
-
-        function addRecord(text) {
-            const historyDiv = document.getElementById('history');
-            const timestamp = new Date().toLocaleTimeString();
-            historyDiv.innerHTML += `<div class="record">[${timestamp}] ${text}</div>`;
-            historyDiv.scrollTop = historyDiv.scrollHeight;
-        }
-
-        function checkStatus() {
-            // 失败检测
-            if (moral <= 0) {
-                alert("💀 账号被封禁！\n\n失败原因：过度使用捷径导致信誉分归零");
-                resetGame();
-            }
-            
-            // 胜利检测
-            if (playCount >= 10000 && money >= 10000) {
-                alert("🎉 成就达成！成为创游大师！\n\n你成功平衡了流量与信誉分！");
-                resetGame();
-            }
-            
-            // 智能提示系统
-            if (playCount > 5000 && money < 3000) {
-                showMessage("💡 提示：需要更多绘画操作来赚取资金！");
-            }
-            if (money > 8000 && playCount < 3000) {
-                showMessage("💡 提示：资金充足，应该多制作游戏！");
-            }
-            if (moral < 50) {
-                showMessage("⚠️ 警告：信誉分过低，建议进行原创创作！");
+        // 生成动态粒子
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            for(let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                particle.style.width = particle.style.height = 
+                    Math.random() * 10 + 5 + 'px';
+                particles.appendChild(particle);
             }
         }
+        createParticles();
 
-        function showMessage(msg) {
-            const historyDiv = document.getElementById('history');
-            historyDiv.innerHTML += `<div class="record" style="color:#0ff">💡 ${msg}</div>`;
-            historyDiv.scrollTop = historyDiv.scrollHeight;
-        }
-
-        function resetGame() {
-            playCount = 0;
-            money = 100;
-            moral = 100;
-            updateDisplay();
-            document.getElementById('history').innerHTML = '<div class="record">📜 新游戏开始！</div>';
-        }
-
-        function showRules() {
-            const rulesText = `📜 游戏规则 📜
-1. 胜利条件：
-   ▶ 同时达到 10,000 游玩量 和 $10,000 金钱
-
-2. 失败条件：
-   ▶ 信誉分归零立即失败
-
-3. 创作机制：
-   🕹️ 制作游戏：
-   - 热门题材：高游玩量 ↘25信誉分
-   - 原创游戏：低游玩量 ↗20信誉分
-
-   🎨 绘制头像：
-   - 描摹作品：高收入 ↘20信誉分
-   - 原创设计：低收入 ↗15信誉分
-
-4. 经济系统：
-   ▶ 制作游戏需要消耗$50
-   ▶ 绘画收入与当前游玩量成正比
-
-5. 提示：
-   ⚠️ 信誉分≤30时会变红警告
-   💡 保持信誉分＞50更安全
-   🔄 交替进行两种创作更高效`;
-
-            alert(rulesText);
-        }
+        // 添加随机颜色变化
+        document.querySelectorAll('.nav-link').forEach(link => {
+            setInterval(() => {
+                link.style.background = `linear-gradient(${Math.random()*360}deg,
+                    #ff0000 0%, #ff7300 15%, #fffb00 30%,
+                    #48ff00 45%, #00ffd5 60%, #002bff 75%,
+                    #7a00ff 90%, #ff00c8 100%)`;
+            }, 3000);
+        });
     </script>
 </body>
 </html>
